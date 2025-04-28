@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "harshyadav2/cake-app"
+        IMAGE_NAME = "harshyadav2/cake-frontend"
     }
 
     stages {
@@ -13,7 +13,7 @@ pipeline {
             }
         }
 
-        stage('2. Build Docker Image') {
+        stage('2. Build Frontend Docker Image') {
             steps {
                 script {
                     echo "Building Docker image: ${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
@@ -24,7 +24,7 @@ pipeline {
             }
         }
 
-        stage('3. Push Docker Image') {
+        stage('3. Push Frontend Docker Image') {
             when {
                 branch 'main' // Only push images from the main branch
             }
@@ -39,11 +39,11 @@ pipeline {
             }
         }
 
-        stage('4. Deploy (Simple Example)') {
+        stage('4. Deploy Frontend') {
             steps {
                 script {
-                    echo "Deploying container..."
-                    def containerName = "cake-website-live"
+                    echo "Deploying frontend container..."
+                    def containerName = "cake-frontend-live"
                     def hostPort = 8081
 
                     sh """
@@ -51,7 +51,7 @@ pipeline {
                         docker rm ${containerName} || true
                         docker run -d --name ${containerName} -p ${hostPort}:80 ${env.IMAGE_NAME}:${env.BUILD_NUMBER}
                     """
-                    echo "Application deployed at http://<jenkins-agent-ip>:${hostPort}"
+                    echo "Frontend deployed at http://<jenkins-agent-ip>:${hostPort}"
                 }
             }
         }
