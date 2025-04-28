@@ -4,15 +4,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch:'main', url: 'https://github.com/harsh-hy/cake'
+                git branch: 'main', url: 'https://github.com/harsh-hy/cake'
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                script {
-                    powershell 'docker-compose up -d'
-                }
+                sh 'docker-compose down || true'
+                sh 'docker-compose up -d --build'
             }
         }
     }
