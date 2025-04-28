@@ -2,136 +2,70 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "cakes-n-shape"
+        IMAGE_NAME = "harshyadav2/cake-app"
     }
 
     stages {
-        stage('Checkout') {
+        stage('1. Checkout Code') {
             steps {
-<<<<<<< HEAD
+                echo 'Checking out code from repository...'
                 checkout scm
             }
         }
 
-        stage('Build Frontend') {
+        stage('2. Build Docker Image') {
             steps {
-                dir('FRONTEND') {
-                    sh 'npm install'
-                    sh 'npm run build'
-=======
-                git branch: 'main', url: 'https://github.com/harsh-hy/cake'
-            }
-        }
-
-        stage('Build and Deploy') {
-            agent {
-                docker {
-                    image 'docker:latest'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
->>>>>>> 09914c944fd99f6a89df160c8d312b7a264a2c58
-                }
-            }
-            steps {
-                sh '''
-                    docker --version
-                    docker-compose --version
-                    docker-compose -f docker-compose.yml down || true
-                    docker-compose -f docker-compose.yml up -d --build
-                '''
-            }
-        }
-
-        stage('Build Backend') {
-            steps {
-                dir('BACKEND') {
-                    sh 'npm install'
-                    sh 'npm run build'
+                script {
+                    echo "Building Docker image: ${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    def image = docker.build("${env.IMAGE_NAME}:${env.BUILD_NUMBER}", ".")
+                    echo "Tagging image as latest..."
+                    image.tag('latest')
                 }
             }
         }
 
-        stage('Docker Build') {
-            steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+        stage('3. Push Docker Image') {
+            when {
+                branch 'main' // Only push images from the main branch
             }
-        }
-
-        stage('Docker Push') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub-credentials', variable: 'DOCKER_PASSWORD')]) {
-                    sh 'echo $DOCKER_PASSWORD | docker login -u your-dockerhub-username --password-stdin'
-                    sh 'docker push $DOCKER_IMAGE'
+                script {
+                    echo "Pushing Docker image: ${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        docker.image("${env.IMAGE_NAME}:${env.BUILD_NUMBER}").push()
+                        docker.image("${env.IMAGE_NAME}:latest").push()
+                    }
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('4. Deploy (Simple Example)') {
             steps {
-                echo 'Deploying application...'
-                // Add deployment steps here
+                script {
+                    echo "Deploying container..."
+                    def containerName = "cake-website-live"
+                    def hostPort = 8081
+
+                    sh """
+                        docker stop ${containerName} || true
+                        docker rm ${containerName} || true
+                        docker run -d --name ${containerName} -p ${hostPort}:80 ${env.IMAGE_NAME}:${env.BUILD_NUMBER}
+                    """
+                    echo "Application deployed at http://<jenkins-agent-ip>:${hostPort}"
+                }
             }
         }
-   // filepath: c:\projj\Cakes-N-Shape\Jenkinsfile
-pipeline {
-    agent any
-
-    environment {
-        DOCKER_IMAGE = "cakes-n-shape"
     }
 
-<<<<<<< HEAD
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                dir('FRONTEND') {
-                    sh 'npm install'
-                    sh 'npm run build'
-                }
-            }
-        }
-
-        stage('Build Backend') {
-            steps {
-                dir('BACKEND') {
-                    sh 'npm install'
-                    sh 'npm run build'
-                }
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
-            }
-        }
-
-        stage('Docker Push') {
-            steps {
-                withCredentials([string(credentialsId: 'dockerhub-credentials', variable: 'DOCKER_PASSWORD')]) {
-                    sh 'echo $DOCKER_PASSWORD | docker login -u your-dockerhub-username --password-stdin'
-                    sh 'docker push $DOCKER_IMAGE'
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying application...'
-                // Add deployment steps here
-            }
-        }
-   
-=======
     post {
         always {
-            echo 'Pipeline executed!'
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
->>>>>>> 09914c944fd99f6a89df160c8d312b7a264a2c58
