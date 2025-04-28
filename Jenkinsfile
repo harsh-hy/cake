@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'docker:24.0.5-cli'  // Lightweight image with Docker CLI
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket to control host Docker
+            image 'docker:24.0.5-cli'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
 
@@ -40,8 +40,10 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline executed!'
-            sh 'docker-compose ps || true' // Show running containers
+            node {
+                echo 'Pipeline executed!'
+                sh 'docker-compose ps || true'
+            }
         }
     }
 }
