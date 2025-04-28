@@ -10,15 +10,19 @@ pipeline {
 
         stage('Deploy with Docker Compose') {
             steps {
-                sh 'docker-compose down || true'
-                sh 'docker-compose up -d --build'
+                script {
+                    docker.image('docker/compose:1.29.2').inside('--network jenkins') {
+                        sh 'docker-compose down || true'
+                        sh 'docker-compose up -d --build'
+                    }
+                }
             }
         }
     }
 
     post {
         always {
-            echo 'Pipeline executed successfully!'
+            echo 'Pipeline executed!'
         }
     }
 }
