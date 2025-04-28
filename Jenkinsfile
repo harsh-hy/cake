@@ -11,9 +11,8 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    docker.image('docker/compose:1.29.2').inside('--network jenkins') {
-                        // Install Docker CLI inside the container
-                        sh 'apt-get update && apt-get install -y docker.io'
+                    // Use docker:19.03.12 which has docker-compose
+                    docker.image('docker:19.03.12').inside('--network jenkins') {
                         sh 'docker-compose down || true'
                         sh 'docker-compose up -d --build'
                     }
