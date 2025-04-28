@@ -8,6 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+<<<<<<< HEAD
                 checkout scm
             }
         }
@@ -17,7 +18,26 @@ pipeline {
                 dir('FRONTEND') {
                     sh 'npm install'
                     sh 'npm run build'
+=======
+                git branch: 'main', url: 'https://github.com/harsh-hy/cake'
+            }
+        }
+
+        stage('Build and Deploy') {
+            agent {
+                docker {
+                    image 'docker:latest'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+>>>>>>> 09914c944fd99f6a89df160c8d312b7a264a2c58
                 }
+            }
+            steps {
+                sh '''
+                    docker --version
+                    docker-compose --version
+                    docker-compose -f docker-compose.yml down || true
+                    docker-compose -f docker-compose.yml up -d --build
+                '''
             }
         }
 
@@ -59,6 +79,7 @@ pipeline {
         DOCKER_IMAGE = "cakes-n-shape"
     }
 
+<<<<<<< HEAD
     stages {
         stage('Checkout') {
             steps {
@@ -106,3 +127,11 @@ pipeline {
             }
         }
    
+=======
+    post {
+        always {
+            echo 'Pipeline executed!'
+        }
+    }
+}
+>>>>>>> 09914c944fd99f6a89df160c8d312b7a264a2c58
