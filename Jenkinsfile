@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:19.03.12'
+            args '--privileged --network host' // Granting privileged access for Docker-in-Docker
+        }
+    }
 
     stages {
         stage('Checkout') {
@@ -11,11 +16,8 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    // Use docker:19.03.12 which has docker-compose
-                    docker.image('docker:19.03.12').inside('--network jenkins') {
-                        sh 'docker-compose down || true'
-                        sh 'docker-compose up -d --build'
-                    }
+                    sh 'docker-compose down || true'
+                    sh 'docker-compose up -d --build'
                 }
             }
         }
