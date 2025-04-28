@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:19.03.12'
-            args '--privileged --network host' // Granting privileged access for Docker-in-Docker
-        }
-    }
+    agent any
 
     stages {
         stage('Checkout') {
@@ -16,6 +11,12 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
+                    // Add debugging steps
+                    echo 'Running Docker Compose commands'
+                    sh 'docker --version'  // Check if Docker is available
+                    sh 'docker-compose --version'  // Check if Docker Compose is available
+
+                    // Run docker-compose commands
                     sh 'docker-compose down || true'
                     sh 'docker-compose up -d --build'
                 }
