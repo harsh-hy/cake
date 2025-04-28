@@ -8,10 +8,20 @@ pipeline {
             }
         }
 
-        stage('Docker Compose Build and Up') {
+        stage('Build and Deploy') {
+            agent {
+                docker {
+                    image 'docker:latest'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
-                sh 'docker-compose down || true'
-                sh 'docker-compose up -d --build'
+                sh '''
+                    docker --version
+                    docker-compose --version
+                    docker-compose -f docker-compose.yml down || true
+                    docker-compose -f docker-compose.yml up -d --build
+                '''
             }
         }
     }
@@ -19,7 +29,6 @@ pipeline {
     post {
         always {
             echo 'Pipeline executed!'
-            sh 'docker-compose ps || true'
         }
     }
 }
