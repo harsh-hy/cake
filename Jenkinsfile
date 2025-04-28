@@ -1,14 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:24.0.5-cli'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
-
-    environment {
-        DOCKER_COMPOSE_VERSION = '1.29.2'
-    }
+    agent any
 
     stages {
         stage('Checkout') {
@@ -17,33 +8,18 @@ pipeline {
             }
         }
 
-        stage('Install Docker Compose') {
+        stage('Docker Compose Build and Up') {
             steps {
-                sh '''
-                apk add --no-cache curl
-                curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-                chmod +x /usr/local/bin/docker-compose
-                docker-compose --version
-                '''
-            }
-        }
-
-        stage('Deploy with Docker Compose') {
-            steps {
-                sh '''
-                docker-compose down || true
-                docker-compose up -d --build
-                '''
+                sh 'docker-compose down || true'
+                sh 'docker-compose up -d --build'
             }
         }
     }
 
     post {
         always {
-            node {
-                echo 'Pipeline executed!'
-                sh 'docker-compose ps || true'
-            }
+            echo 'Pipeline executed!'
+            sh 'docker-compose ps || true'
         }
     }
 }
