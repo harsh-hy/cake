@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import cors from "cors"
 import { errorMiddleware } from "./error/error.js";
 import reservationRouter from "./routes/reservationRoute.js";
-import { dbConnection } from "./database/dbConnection.js";
 import signupRouter from "./routes/signupRoute.js";
 import loginRouter from "./routes/loginRoute.js";
 import reviewRoutes from './routes/reviewRoutes.js';
@@ -24,7 +23,6 @@ app.use("/api/v1/signup", signupRouter);
 app.use("/api/v1/login",loginRouter);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/auth', authRoutes);
-dbConnection();
 
 app.use(errorMiddleware);
 

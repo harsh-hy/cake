@@ -1,10 +1,13 @@
-import Review from '../models/reviewModel.js';
 import { sendEmail } from "../utils/emailSender.js";
 
 // Controller to get all reviews
 const getAllReviews = async (req, res) => {
   try {
-    const reviews = await Review.find();
+    // Return a static response instead of querying the database
+    const reviews = [
+      { name: "John Doe", content: "Great service!", rating: 5 },
+      { name: "Jane Smith", content: "Loved the food!", rating: 4 }
+    ];
     res.json(reviews);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -21,27 +24,8 @@ const addReview = async (req, res) => {
   }
 
   try {
-    // Create a new review
-    const newReview = new Review({ name, content, rating });
-    await newReview.save();
-
-    // Customize the email content
-    const emailContent = `
-      <p>Dear ${name.toUpperCase()},
-      Thank you for taking the time to submit a review. We appreciate your feedback and value your opinion.
-      Your review:
-      Rating: ${rating} stars
-      Content: ${content}
-      We are constantly working to improve, and your review helps us provide better service to you and other customers.
-      Best regards,
-      Dwija Bake Studio Team</p>
-    `;
-
-    // Send the thank-you email
-    await sendEmail(email, 'Thank You for Your Review!', emailContent);
-
-    // Respond with success message
-    res.status(201).json({ message: 'Review added successfully', review: newReview });
+    // Return a static success response
+    res.status(201).json({ message: 'Review added successfully', review: { name, content, rating } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
