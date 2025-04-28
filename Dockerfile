@@ -13,9 +13,6 @@ COPY BACKEND/package*.json ./
 RUN npm install
 COPY BACKEND/ .
 
-# Uncomment the following line if the backend requires a build step
-# RUN npm run build
-
 # Final image
 FROM node:20-alpine
 WORKDIR /app
@@ -23,11 +20,11 @@ WORKDIR /app
 # Copy built frontend
 COPY --from=frontend-build /frontend/dist ./frontend
 
-# Copy backend files (or built files if a build step is required)
+# Copy backend files
 COPY --from=backend-build /backend ./backend
 
 # Expose ports
 EXPOSE 3000 5173
 
 # Start backend
-CMD ["node", "./backend/index.js"]
+CMD ["node", "./backend/server.js"]
