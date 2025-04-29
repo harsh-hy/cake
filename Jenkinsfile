@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "harshyadav2/cake-frontend"
+        IMAGE_NAME = "harshyadav2/cake"
     }
 
     stages {
