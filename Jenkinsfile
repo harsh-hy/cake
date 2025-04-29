@@ -13,7 +13,7 @@ pipeline {
             }
         }
 
-        stage('2. Build Frontend Docker Image') {
+        stage('2. Build Docker Image') {
             steps {
                 script {
                     echo "Building Docker image: ${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
@@ -39,11 +39,11 @@ pipeline {
             }
         }
 
-        stage('4. Deploy Frontend') {
+        stage('4. Deploy Cakes-n-Bakes') {
             steps {
                 script {
                     echo "Deploying container..."
-                    def containerName = "cake-frontend-live"
+                    def containerName = "cake-N-Bakes-live"
                     def hostPort = 8081
 
                     sh """
@@ -51,7 +51,7 @@ pipeline {
                         docker rm ${containerName} || true
                         docker run -d --name ${containerName} -p ${hostPort}:80 ${env.IMAGE_NAME}:${env.BUILD_NUMBER}
                     """
-                    echo "Frontend deployed at http://<jenkins-agent-ip>:${hostPort}"
+                    echo "Cakes-N-Bakes deployed at http://<jenkins-agent-ip>:${hostPort}"
                 }
             }
         }
