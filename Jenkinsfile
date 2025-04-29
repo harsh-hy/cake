@@ -24,7 +24,7 @@ pipeline {
             }
         }
 
-        stage('3. Push Frontend Docker Image') {
+        stage('3. Push Docker Image') {
             when {
                 branch 'main' // Only push images from the main branch
             }
@@ -42,7 +42,7 @@ pipeline {
         stage('4. Deploy Frontend') {
             steps {
                 script {
-                    echo "Deploying frontend container..."
+                    echo "Deploying container..."
                     def containerName = "cake-frontend-live"
                     def hostPort = 8081
 
