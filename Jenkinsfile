@@ -25,9 +25,7 @@ pipeline {
         }
 
         stage('3. Push Docker Image') {
-           // when {
-             //   branch 'main' // Only push images from the main branch
-            //}
+           
             steps {
                 script {
                     echo "Pushing Docker image: ${env.IMAGE_NAME}:${env.BUILD_NUMBER}"
